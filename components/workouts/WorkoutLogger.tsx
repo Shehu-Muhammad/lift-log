@@ -23,47 +23,124 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
   const [selectedOptions, setSelectedOptions] = useState<
     Record<string, string>
   >({});
+  const [saveMessage, setSaveMessage] = useState('');
 
+  // function finishWorkout() {
+  //   console.log('ENTRIES BEFORE SAVE:', entries);
+  //   const workoutLog: WorkoutLog = {
+  //     id: crypto.randomUUID(),
+  //     workoutId: workout.id,
+  //     workoutName: workout.name,
+  //     completedAt: new Date().toISOString(),
+  //     exercises: workout.exercises.map((exercise) => {
+  //       const selectedOptionId = selectedOptions[exercise.id];
+
+  //       const selectedOption = exercise.options?.find(
+  //         (option) => option.id === selectedOptionId,
+  //       );
+
+  //       return {
+  //         exerciseId: exercise.id,
+  //         exerciseName: selectedOption?.name ?? exercise.name,
+  //         selectedOptionId: selectedOption?.id,
+  //         selectedOptionName: selectedOption?.name,
+  //         sets: Array.from({ length: exercise.sets }).map((_, setIndex) => {
+  //           const setId = `${exercise.id}-${setIndex}`;
+  //           const entry = entries[setId] ?? {
+  //             weight: '',
+  //             reps: '',
+  //             duration: '',
+  //             completed: false,
+  //           };
+
+  //           console.log('Saving:', setId, entry);
+
+  //           return {
+  //             setNumber: setIndex + 1,
+  //             weight:
+  //               entry.weight.trim() !== '' ? Number(entry.weight) : undefined,
+  //             reps: entry.reps.trim() !== '' ? Number(entry.reps) : undefined,
+  //             duration:
+  //               entry.duration.trim() !== ''
+  //                 ? Number(entry.duration)
+  //                 : undefined,
+  //             completed: entry.completed,
+  //           };
+  //         }),
+  //       };
+  //     }),
+  //   };
+
+  //   saveWorkoutLog(workoutLog);
+
+  //   setSaveMessage('Workout saved successfully!');
+  //   setEntries({});
+  //   setSelectedOptions({});
+  // }
   function finishWorkout() {
-    const workoutLog: WorkoutLog = {
-      id: crypto.randomUUID(),
-      workoutId: workout.id,
-      workoutName: workout.name,
-      completedAt: new Date().toISOString(),
-      exercises: workout.exercises.map((exercise) => {
-        const selectedOptionId = selectedOptions[exercise.id];
+    console.log('finishWorkout started');
+    console.log('Current entries:', entries);
+    console.log('Selected options:', selectedOptions);
 
-        const selectedOption = exercise.options?.find(
-          (option) => option.id === selectedOptionId,
-        );
+    try {
+      const workoutLog: WorkoutLog = {
+        id: crypto.randomUUID(),
+        workoutId: workout.id,
+        workoutName: workout.name,
+        completedAt: new Date().toISOString(),
+        exercises: workout.exercises.map((exercise) => {
+          const selectedOptionId = selectedOptions[exercise.id];
 
-        return {
-          exerciseId: exercise.id,
-          exerciseName: selectedOption?.name ?? exercise.name,
-          selectedOptionId: selectedOption?.id,
-          selectedOptionName: selectedOption?.name,
-          sets: Array.from({ length: exercise.sets }).map((_, setIndex) => {
-            const setId = `${exercise.id}-${setIndex}`;
-            const entry = getSetEntry(setId);
+          const selectedOption = exercise.options?.find(
+            (option) => option.id === selectedOptionId,
+          );
 
-            return {
-              setNumber: setIndex + 1,
-              weight: entry.weight ? Number(entry.weight) : undefined,
-              reps: entry.reps ? Number(entry.reps) : undefined,
-              duration: entry.duration ? Number(entry.duration) : undefined,
-              completed: entry.completed,
-            };
-          }),
-        };
-      }),
-    };
+          return {
+            exerciseId: exercise.id,
+            exerciseName: selectedOption?.name ?? exercise.name,
+            selectedOptionId: selectedOption?.id,
+            selectedOptionName: selectedOption?.name,
+            sets: Array.from({ length: exercise.sets }).map((_, setIndex) => {
+              const setId = `${exercise.id}-${setIndex}`;
 
-    saveWorkoutLog(workoutLog);
+              const entry = entries[setId] ?? {
+                weight: '',
+                reps: '',
+                duration: '',
+                completed: false,
+              };
 
-    console.log('Saved workout:', workoutLog);
+              return {
+                setNumber: setIndex + 1,
+                weight:
+                  entry.weight.trim() !== '' ? Number(entry.weight) : undefined,
+                reps: entry.reps.trim() !== '' ? Number(entry.reps) : undefined,
+                duration:
+                  entry.duration.trim() !== ''
+                    ? Number(entry.duration)
+                    : undefined,
+                completed: entry.completed,
+              };
+            }),
+          };
+        }),
+      };
+
+      console.log('Workout log before save:', workoutLog);
+
+      saveWorkoutLog(workoutLog);
+
+      setSaveMessage('Workout saved successfully.');
+      setEntries({});
+      setSelectedOptions({});
+    } catch (error) {
+      console.error('Workout save failed:', error);
+      setSaveMessage('Workout could not be saved.');
+    }
   }
 
   function selectExerciseOption(exerciseId: string, optionId: string) {
+    setSaveMessage('');
     setSelectedOptions((current) => ({
       ...current,
       [exerciseId]: optionId,
@@ -86,13 +163,28 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
     field: keyof SetEntry,
     value: string | boolean,
   ) {
-    setEntries((current) => ({
-      ...current,
-      [setId]: {
-        ...getSetEntry(setId),
+    setSaveMessage('');
+
+    setEntries((current) => {
+      const currentEntry: SetEntry = current[setId] ?? {
+        weight: '',
+        reps: '',
+        duration: '',
+        completed: false,
+      };
+
+      const updatedEntry = {
+        ...currentEntry,
         [field]: value,
-      },
-    }));
+      };
+
+      console.log('Updating set:', setId, updatedEntry);
+
+      return {
+        ...current,
+        [setId]: updatedEntry,
+      };
+    });
   }
 
   return (
@@ -266,10 +358,29 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
         );
       })}
 
-      <button
+      {saveMessage && (
+        <p
+          role='status'
+          className='rounded-lg border border-green-800 bg-green-950 p-3 text-sm text-green-300'
+        >
+          {saveMessage}
+        </p>
+      )}
+
+      {/* <button
         type='button'
         onClick={finishWorkout}
         className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500'
+      >
+        Finish Workout
+      </button> */}
+      <button
+        type='button'
+        onClick={() => {
+          console.log('Finish button clicked');
+          finishWorkout();
+        }}
+        className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white'
       >
         Finish Workout
       </button>

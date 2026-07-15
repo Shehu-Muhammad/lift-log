@@ -15,16 +15,30 @@ export function getWorkoutLogs(): WorkoutLog[] {
 
   try {
     return JSON.parse(storedLogs) as WorkoutLog[];
-  } catch {
+  } catch (error) {
+    console.error("Could not parse workout logs:", error);
     return [];
   }
 }
 
 export function saveWorkoutLog(workoutLog: WorkoutLog): void {
+  if (typeof window === "undefined") {
+    console.error("localStorage is unavailable");
+    return;
+  }
+
   const currentLogs = getWorkoutLogs();
+  const updatedLogs = [workoutLog, ...currentLogs];
+
+  console.log("Saving workout logs:", updatedLogs);
 
   window.localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify([workoutLog, ...currentLogs]),
+    JSON.stringify(updatedLogs),
+  );
+
+  console.log(
+    "Saved localStorage value:",
+    window.localStorage.getItem(STORAGE_KEY),
   );
 }
