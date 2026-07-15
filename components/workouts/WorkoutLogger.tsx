@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import type { Workout } from '@/types/workout';
+import { saveWorkoutLog } from '@/lib/storage/workoutLogs';
+import type { WorkoutLog } from '@/types/workoutLog';
 
 type WorkoutLoggerProps = {
   workout: Workout;
@@ -21,6 +23,45 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
   const [selectedOptions, setSelectedOptions] = useState<
     Record<string, string>
   >({});
+
+  function finishWorkout() {
+    const workoutLog: WorkoutLog = {
+      id: crypto.randomUUID(),
+      workoutId: workout.id,
+      workoutName: workout.name,
+      completedAt: new Date().toISOString(),
+      exercises: workout.exercises.map((exercise) => {
+        const selectedOptionId = selectedOptions[exercise.id];
+
+        const selectedOption = exercise.options?.find(
+          (option) => option.id === selectedOptionId,
+        );
+
+        return {
+          exerciseId: exercise.id,
+          exerciseName: selectedOption?.name ?? exercise.name,
+          selectedOptionId: selectedOption?.id,
+          selectedOptionName: selectedOption?.name,
+          sets: Array.from({ length: exercise.sets }).map((_, setIndex) => {
+            const setId = `${exercise.id}-${setIndex}`;
+            const entry = getSetEntry(setId);
+
+            return {
+              setNumber: setIndex + 1,
+              weight: entry.weight ? Number(entry.weight) : undefined,
+              reps: entry.reps ? Number(entry.reps) : undefined,
+              duration: entry.duration ? Number(entry.duration) : undefined,
+              completed: entry.completed,
+            };
+          }),
+        };
+      }),
+    };
+
+    saveWorkoutLog(workoutLog);
+
+    console.log('Saved workout:', workoutLog);
+  }
 
   function selectExerciseOption(exerciseId: string, optionId: string) {
     setSelectedOptions((current) => ({
@@ -227,12 +268,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
 
       <button
         type='button'
-        onClick={() =>
-          console.log({
-            entries,
-            selectedOptions,
-          })
-        }
+        onClick={finishWorkout}
         className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500'
       >
         Finish Workout
