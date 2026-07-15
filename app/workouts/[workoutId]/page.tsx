@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { workouts } from '@/data/workouts';
+import WorkoutLogger from '@/components/workouts/WorkoutLogger';
 
 type WorkoutPageProps = {
   params: Promise<{
@@ -27,24 +28,7 @@ export default async function WorkoutPage({ params }: WorkoutPageProps) {
       <p className='mt-2 text-slate-400'>{workout.description}</p>
 
       <div className='mt-8 space-y-4'>
-        {workout.exercises.map((exercise, index) => (
-          <article
-            key={exercise.id}
-            className='rounded-xl border border-slate-800 bg-slate-900 p-5'
-          >
-            <h2 className='text-lg font-semibold text-white'>
-              {index + 1}. {exercise.name}
-            </h2>
-
-            <p className='mt-1 text-sm text-slate-300'>
-              {exercise.sets} sets × {exercise.reps}
-            </p>
-
-            {exercise.notes && (
-              <p className='mt-2 text-sm text-slate-400'>{exercise.notes}</p>
-            )}
-          </article>
-        ))}
+        <WorkoutLogger workout={workout} />
       </div>
     </section>
   );
