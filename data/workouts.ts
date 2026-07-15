@@ -113,6 +113,19 @@ export const workouts: Workout[] = [
         name: "Ab Wheel Rollout or Dead Bug",
         sets: 3,
         reps: "8–12",
+        notes: "Choose one exercise for this workout.",
+        options: [
+          {
+            id: "ab-wheel-rollout",
+            name: "Ab Wheel Rollout",
+            trackingType: "bodyweight-reps",
+          },
+          {
+            id: "dead-bug",
+            name: "Dead Bug",
+            trackingType: "bodyweight-reps",
+          }
+        ]
       },
     ],
   },
