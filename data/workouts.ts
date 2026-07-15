@@ -48,6 +48,7 @@ export const workouts: Workout[] = [
         name: "Plank",
         sets: 3,
         reps: "60 seconds",
+        trackingType: "duration",
       },
     ],
   },
@@ -74,6 +75,19 @@ export const workouts: Workout[] = [
         name: "Pull-Ups or Lat Pulldown",
         sets: 3,
         reps: "8–10",
+        notes: "Choose one exercise for this workout.",
+        options: [
+          {
+            id: "pull-up",
+            name: "Pull-Up",
+            trackingType: "bodyweight-reps"
+          },
+          {
+            id: "lat-pulldown",
+            name: "Lat Pulldown",
+            trackingType: "weight-reps"
+          }
+        ]
       },
       {
         id: "zercher-squat",
