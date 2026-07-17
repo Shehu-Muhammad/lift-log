@@ -1,11 +1,9 @@
-import type { WorkoutLog } from "@/types/workoutLog";
+import type { LoggedSet, WorkoutLog } from "@/types/workoutLog";
 
 export type PreviousPerformance = {
   exerciseId: string;
   selectedOptionId?: string;
-  weight?: number;
-  reps?: number;
-  duration?: number;
+  sets: LoggedSet[];
   completedAt: string;
 };
 
@@ -15,9 +13,9 @@ export function getPreviousPerformance(
   exerciseId: string,
   selectedOptionId?: string,
 ): PreviousPerformance | undefined {
-  const matchingLog = logs.find((log) => {
+  for (const log of logs) {
     if (log.workoutId !== workoutId) {
-      return false;
+      continue;
     }
 
     const matchingExercise = log.exercises.find((exercise) => {
@@ -29,46 +27,28 @@ export function getPreviousPerformance(
         return exercise.selectedOptionId === selectedOptionId;
       }
 
-      return true;
+      return !exercise.selectedOptionId;
     });
 
-    return Boolean(matchingExercise);
-  });
-
-  if (!matchingLog) {
-    return undefined;
-  }
-
-  const matchingExercise = matchingLog.exercises.find((exercise) => {
-    if (exercise.exerciseId !== exerciseId) {
-      return false;
+    if (!matchingExercise) {
+      continue;
     }
 
-    if (selectedOptionId) {
-      return exercise.selectedOptionId === selectedOptionId;
+    const completedSets = matchingExercise.sets.filter(
+      (set) => set.completed,
+    );
+
+    if (completedSets.length === 0) {
+      continue;
     }
 
-    return true;
-  });
-
-  if (!matchingExercise) {
-    return undefined;
+    return {
+      exerciseId,
+      selectedOptionId,
+      sets: completedSets,
+      completedAt: log.completedAt,
+    };
   }
 
-  const latestCompletedSet = [...matchingExercise.sets]
-    .reverse()
-    .find((set) => set.completed);
-
-  if (!latestCompletedSet) {
-    return undefined;
-  }
-
-  return {
-    exerciseId,
-    selectedOptionId,
-    weight: latestCompletedSet.weight,
-    reps: latestCompletedSet.reps,
-    duration: latestCompletedSet.duration,
-    completedAt: matchingLog.completedAt,
-  };
+  return undefined;
 }

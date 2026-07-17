@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getWorkoutLogs } from '@/lib/storage/workoutLogs';
+import { getWorkoutLogs, saveWorkoutLog } from '@/lib/storage/workoutLogs';
 import {
   getPreviousPerformance,
   type PreviousPerformance,
 } from '@/lib/workouts/previousPerformance';
 import type { Workout } from '@/types/workout';
-import { saveWorkoutLog } from '@/lib/storage/workoutLogs';
 import type { WorkoutLog } from '@/types/workoutLog';
 
 type WorkoutLoggerProps = {
@@ -35,118 +34,55 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
     setWorkoutLogs(getWorkoutLogs());
   }, []);
 
-  // function finishWorkout() {
-  //   console.log('ENTRIES BEFORE SAVE:', entries);
-  //   const workoutLog: WorkoutLog = {
-  //     id: crypto.randomUUID(),
-  //     workoutId: workout.id,
-  //     workoutName: workout.name,
-  //     completedAt: new Date().toISOString(),
-  //     exercises: workout.exercises.map((exercise) => {
-  //       const selectedOptionId = selectedOptions[exercise.id];
-
-  //       const selectedOption = exercise.options?.find(
-  //         (option) => option.id === selectedOptionId,
-  //       );
-
-  //       return {
-  //         exerciseId: exercise.id,
-  //         exerciseName: selectedOption?.name ?? exercise.name,
-  //         selectedOptionId: selectedOption?.id,
-  //         selectedOptionName: selectedOption?.name,
-  //         sets: Array.from({ length: exercise.sets }).map((_, setIndex) => {
-  //           const setId = `${exercise.id}-${setIndex}`;
-  //           const entry = entries[setId] ?? {
-  //             weight: '',
-  //             reps: '',
-  //             duration: '',
-  //             completed: false,
-  //           };
-
-  //           console.log('Saving:', setId, entry);
-
-  //           return {
-  //             setNumber: setIndex + 1,
-  //             weight:
-  //               entry.weight.trim() !== '' ? Number(entry.weight) : undefined,
-  //             reps: entry.reps.trim() !== '' ? Number(entry.reps) : undefined,
-  //             duration:
-  //               entry.duration.trim() !== ''
-  //                 ? Number(entry.duration)
-  //                 : undefined,
-  //             completed: entry.completed,
-  //           };
-  //         }),
-  //       };
-  //     }),
-  //   };
-
-  //   saveWorkoutLog(workoutLog);
-
-  //   setSaveMessage('Workout saved successfully!');
-  //   setEntries({});
-  //   setSelectedOptions({});
-  // }
   function finishWorkout() {
-    console.log('finishWorkout started');
-    console.log('Current entries:', entries);
-    console.log('Selected options:', selectedOptions);
+    const workoutLog: WorkoutLog = {
+      id: crypto.randomUUID(),
+      workoutId: workout.id,
+      workoutName: workout.name,
+      completedAt: new Date().toISOString(),
+      exercises: workout.exercises.map((exercise) => {
+        const selectedOptionId = selectedOptions[exercise.id];
 
-    try {
-      const workoutLog: WorkoutLog = {
-        id: crypto.randomUUID(),
-        workoutId: workout.id,
-        workoutName: workout.name,
-        completedAt: new Date().toISOString(),
-        exercises: workout.exercises.map((exercise) => {
-          const selectedOptionId = selectedOptions[exercise.id];
+        const selectedOption = exercise.options?.find(
+          (option) => option.id === selectedOptionId,
+        );
 
-          const selectedOption = exercise.options?.find(
-            (option) => option.id === selectedOptionId,
-          );
+        return {
+          exerciseId: exercise.id,
+          exerciseName: selectedOption?.name ?? exercise.name,
+          selectedOptionId: selectedOption?.id,
+          selectedOptionName: selectedOption?.name,
+          sets: Array.from({ length: exercise.sets }).map((_, setIndex) => {
+            const setId = `${exercise.id}-${setIndex}`;
+            const entry = entries[setId] ?? {
+              weight: '',
+              reps: '',
+              duration: '',
+              completed: false,
+            };
 
-          return {
-            exerciseId: exercise.id,
-            exerciseName: selectedOption?.name ?? exercise.name,
-            selectedOptionId: selectedOption?.id,
-            selectedOptionName: selectedOption?.name,
-            sets: Array.from({ length: exercise.sets }).map((_, setIndex) => {
-              const setId = `${exercise.id}-${setIndex}`;
+            return {
+              setNumber: setIndex + 1,
+              weight:
+                entry.weight.trim() !== '' ? Number(entry.weight) : undefined,
+              reps: entry.reps.trim() !== '' ? Number(entry.reps) : undefined,
+              duration:
+                entry.duration.trim() !== ''
+                  ? Number(entry.duration)
+                  : undefined,
+              completed: entry.completed,
+            };
+          }),
+        };
+      }),
+    };
 
-              const entry = entries[setId] ?? {
-                weight: '',
-                reps: '',
-                duration: '',
-                completed: false,
-              };
+    saveWorkoutLog(workoutLog);
 
-              return {
-                setNumber: setIndex + 1,
-                weight:
-                  entry.weight.trim() !== '' ? Number(entry.weight) : undefined,
-                reps: entry.reps.trim() !== '' ? Number(entry.reps) : undefined,
-                duration:
-                  entry.duration.trim() !== ''
-                    ? Number(entry.duration)
-                    : undefined,
-                completed: entry.completed,
-              };
-            }),
-          };
-        }),
-      };
-
-      console.log('Workout log before save:', workoutLog);
-
-      saveWorkoutLog(workoutLog);
-
-      setSaveMessage('Workout saved successfully.');
-      setEntries({});
-      setSelectedOptions({});
-    } catch (error) {
-      console.error('Workout save failed:', error);
-      setSaveMessage('Workout could not be saved.');
-    }
+    setWorkoutLogs(getWorkoutLogs());
+    setSaveMessage('Workout saved successfully!');
+    setEntries({});
+    setSelectedOptions({});
   }
 
   function selectExerciseOption(exerciseId: string, optionId: string) {
@@ -188,8 +124,6 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
         [field]: value,
       };
 
-      console.log('Updating set:', setId, updatedEntry);
-
       return {
         ...current,
         [setId]: updatedEntry,
@@ -218,6 +152,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
             exercise.id,
             selectedOption?.id,
           );
+        const previousSet = previousPerformance?.sets[0];
 
         return (
           <section
@@ -270,31 +205,18 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
               )}
             </div>
 
-            {(!exercise.options || selectedOption) && previousPerformance && (
+            {(!exercise.options || selectedOption) && previousSet && (
               <div className='mt-4 rounded-lg border border-slate-800 bg-slate-950 p-3'>
                 <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>
                   Last time
                 </p>
 
                 <p className='mt-1 text-sm text-slate-300'>
-                  {previousPerformance.duration !== undefined
-                    ? `${previousPerformance.duration} seconds`
-                    : previousPerformance.weight !== undefined
-                      ? `${previousPerformance.weight} lbs × ${
-                          previousPerformance.reps ?? 0
-                        } reps`
-                      : `${previousPerformance.reps ?? 0} reps`}
-                </p>
-
-                <p className='mt-1 text-xs text-slate-500'>
-                  {new Date(previousPerformance.completedAt).toLocaleDateString(
-                    'en-US',
-                    {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    },
-                  )}
+                  {previousSet.duration !== undefined
+                    ? `${previousSet.duration} seconds`
+                    : previousSet.weight !== undefined
+                      ? `${previousSet.weight} lbs × ${previousSet.reps ?? 0} reps`
+                      : `${previousSet.reps ?? 0} reps`}
                 </p>
               </div>
             )}
@@ -308,6 +230,8 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                 {Array.from({ length: exercise.sets }).map((_, setIndex) => {
                   const setId = `${exercise.id}-${setIndex}`;
                   const entry = getSetEntry(setId);
+                  const previousSetForIndex =
+                    previousPerformance?.sets[setIndex];
 
                   return (
                     <div
@@ -325,8 +249,13 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                             <input
                               type='number'
                               min='0'
+                              step='1'
                               inputMode='numeric'
-                              placeholder='60'
+                              placeholder={
+                                previousSetForIndex?.duration !== undefined
+                                  ? String(previousSetForIndex.duration)
+                                  : '60'
+                              }
                               value={entry.duration}
                               onChange={(event) =>
                                 updateSet(setId, 'duration', event.target.value)
@@ -349,7 +278,11 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                                 min='0'
                                 step='0.5'
                                 inputMode='decimal'
-                                placeholder='lbs'
+                                placeholder={
+                                  previousSetForIndex?.weight !== undefined
+                                    ? String(previousSetForIndex.weight)
+                                    : 'lbs'
+                                }
                                 value={entry.weight}
                                 onChange={(event) =>
                                   updateSet(setId, 'weight', event.target.value)
@@ -370,8 +303,13 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                             <input
                               type='number'
                               min='0'
+                              step='1'
                               inputMode='numeric'
-                              placeholder='0'
+                              placeholder={
+                                previousSetForIndex?.reps !== undefined
+                                  ? String(previousSetForIndex.reps)
+                                  : '0'
+                              }
                               value={entry.reps}
                               onChange={(event) =>
                                 updateSet(setId, 'reps', event.target.value)
@@ -414,20 +352,10 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
         </p>
       )}
 
-      {/* <button
+      <button
         type='button'
         onClick={finishWorkout}
         className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500'
-      >
-        Finish Workout
-      </button> */}
-      <button
-        type='button'
-        onClick={() => {
-          console.log('Finish button clicked');
-          finishWorkout();
-        }}
-        className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white'
       >
         Finish Workout
       </button>
