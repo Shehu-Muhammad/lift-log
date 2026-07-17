@@ -1,6 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getWorkoutLogs } from '@/lib/storage/workoutLogs';
+import {
+  getPreviousPerformance,
+  type PreviousPerformance,
+} from '@/lib/workouts/previousPerformance';
 import type { Workout } from '@/types/workout';
 import { saveWorkoutLog } from '@/lib/storage/workoutLogs';
 import type { WorkoutLog } from '@/types/workoutLog';
@@ -24,6 +29,11 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
     Record<string, string>
   >({});
   const [saveMessage, setSaveMessage] = useState('');
+  const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
+
+  useEffect(() => {
+    setWorkoutLogs(getWorkoutLogs());
+  }, []);
 
   // function finishWorkout() {
   //   console.log('ENTRIES BEFORE SAVE:', entries);
@@ -201,6 +211,14 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
           exercise.trackingType ??
           'weight-reps';
 
+        const previousPerformance: PreviousPerformance | undefined =
+          getPreviousPerformance(
+            workoutLogs,
+            workout.id,
+            exercise.id,
+            selectedOption?.id,
+          );
+
         return (
           <section
             key={exercise.id}
@@ -252,9 +270,38 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
               )}
             </div>
 
+            {(!exercise.options || selectedOption) && previousPerformance && (
+              <div className='mt-4 rounded-lg border border-slate-800 bg-slate-950 p-3'>
+                <p className='text-xs font-medium uppercase tracking-wide text-slate-500'>
+                  Last time
+                </p>
+
+                <p className='mt-1 text-sm text-slate-300'>
+                  {previousPerformance.duration !== undefined
+                    ? `${previousPerformance.duration} seconds`
+                    : previousPerformance.weight !== undefined
+                      ? `${previousPerformance.weight} lbs × ${
+                          previousPerformance.reps ?? 0
+                        } reps`
+                      : `${previousPerformance.reps ?? 0} reps`}
+                </p>
+
+                <p className='mt-1 text-xs text-slate-500'>
+                  {new Date(previousPerformance.completedAt).toLocaleDateString(
+                    'en-US',
+                    {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    },
+                  )}
+                </p>
+              </div>
+            )}
+
             {exercise.options && !selectedOption ? (
               <p className='mt-5 rounded-lg border border-slate-800 bg-slate-950 p-4 text-sm text-slate-400'>
-                Choose Pull-Ups or Lat Pulldown to begin logging sets.
+                Choose an exercise to begin logging sets.
               </p>
             ) : (
               <div className='mt-5 space-y-3'>
