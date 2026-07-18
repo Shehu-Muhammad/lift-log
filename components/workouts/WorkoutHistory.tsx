@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { getWorkoutLogs } from "@/lib/storage/workoutLogs";
-import type { WorkoutLog } from "@/types/workoutLog";
+import { useEffect, useState } from 'react';
+import { getWorkoutLogs } from '@/lib/storage/workoutLogs';
+import type { WorkoutLog } from '@/types/workoutLog';
+import Link from 'next/link';
 
 export default function WorkoutHistory() {
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
@@ -14,17 +15,17 @@ export default function WorkoutHistory() {
   }, []);
 
   if (isLoading) {
-    return <p className="mt-8 text-slate-400">Loading workout history...</p>;
+    return <p className='mt-8 text-slate-400'>Loading workout history...</p>;
   }
 
   if (workoutLogs.length === 0) {
     return (
-      <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900 p-6">
-        <h2 className="text-lg font-semibold text-white">
+      <div className='mt-8 rounded-xl border border-slate-800 bg-slate-900 p-6'>
+        <h2 className='text-lg font-semibold text-white'>
           No workouts logged yet
         </h2>
 
-        <p className="mt-2 text-sm text-slate-400">
+        <p className='mt-2 text-sm text-slate-400'>
           Finish a workout to see it appear here.
         </p>
       </div>
@@ -32,7 +33,7 @@ export default function WorkoutHistory() {
   }
 
   return (
-    <div className="mt-8 space-y-5">
+    <div className='mt-8 space-y-5'>
       {workoutLogs.map((log) => {
         const completedSets = log.exercises.reduce(
           (total, exercise) =>
@@ -46,36 +47,37 @@ export default function WorkoutHistory() {
         );
 
         return (
-          <article
+          <Link
             key={log.id}
-            className="rounded-xl border border-slate-800 bg-slate-900 p-5"
+            href={`/history/${log.id}`}
+            className='block rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-600 hover:bg-slate-800/80'
           >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
               <div>
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className='text-xl font-semibold text-white'>
                   {log.workoutName}
                 </h2>
 
-                <p className="mt-1 text-sm text-slate-400">
-                  {new Date(log.completedAt).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
+                <p className='mt-1 text-sm text-slate-400'>
+                  {new Date(log.completedAt).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
                   })}
-                  {" at "}
-                  {new Date(log.completedAt).toLocaleTimeString("en-US", {
-                    hour: "numeric",
-                    minute: "2-digit",
+                  {' at '}
+                  {new Date(log.completedAt).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
                   })}
                 </p>
               </div>
 
-              <span className="w-fit rounded-full bg-slate-800 px-3 py-1 text-sm text-slate-300">
+              <span className='w-fit rounded-full bg-slate-800 px-3 py-1 text-sm text-slate-300'>
                 {completedSets} of {totalSets} sets completed
               </span>
             </div>
 
-            <div className="mt-5 space-y-3">
+            <div className='mt-5 space-y-3'>
               {log.exercises.map((exercise) => {
                 const completedExerciseSets = exercise.sets.filter(
                   (set) => set.completed,
@@ -84,38 +86,20 @@ export default function WorkoutHistory() {
                 return (
                   <div
                     key={exercise.exerciseId}
-                    className="rounded-lg border border-slate-800 bg-slate-950 p-4"
+                    className='rounded-lg border border-slate-800 bg-slate-950 p-4'
                   >
-                    <h3 className="font-medium text-white">
+                    <h3 className='font-medium text-white'>
                       {exercise.exerciseName}
                     </h3>
 
-                    {completedExerciseSets.length === 0 ? (
-                      <p className="mt-2 text-sm text-slate-500">
-                        No completed sets
-                      </p>
-                    ) : (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {completedExerciseSets.map((set) => (
-                          <span
-                            key={set.setNumber}
-                            className="rounded-md bg-slate-800 px-3 py-1 text-sm text-slate-300"
-                          >
-                            Set {set.setNumber}:{" "}
-                            {set.duration !== undefined
-                              ? `${set.duration} seconds`
-                              : set.weight !== undefined
-                                ? `${set.weight} lbs × ${set.reps ?? 0}`
-                                : `${set.reps ?? 0} reps`}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <p className='mt-2 text-sm text-slate-400'>
+                      {completedExerciseSets.length} completed sets
+                    </p>
                   </div>
                 );
               })}
             </div>
-          </article>
+          </Link>
         );
       })}
     </div>
