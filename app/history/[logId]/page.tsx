@@ -1,3 +1,5 @@
+import WorkoutHistoryDetail from '@/components/workouts/WorkoutHistoryDetail';
+
 type HistoryDetailPageProps = {
   params: Promise<{
     logId: string;
@@ -15,13 +17,13 @@ export default async function HistoryDetailPage({
         Workout Details
       </p>
 
-      <h1 className='mt-2 text-3xl font-bold text-white'>
-        Workout Log
-      </h1>
+      <h1 className='mt-2 text-3xl font-bold text-white'>Workout Log</h1>
 
       <p className='mt-2 text-slate-400'>
-        Log ID: {logId}
+        Review every set from this workout session.
       </p>
+
+      <WorkoutHistoryDetail logId={logId} />
     </section>
   );
 }
