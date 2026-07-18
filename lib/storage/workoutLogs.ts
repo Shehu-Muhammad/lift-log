@@ -42,3 +42,12 @@ export function saveWorkoutLog(workoutLog: WorkoutLog): void {
     window.localStorage.getItem(STORAGE_KEY),
   );
 }
+
+export function deleteWorkoutLog(logId: string): void {
+  const updatedLogs = getWorkoutLogs().filter((log) => log.id !== logId);
+
+  window.localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(updatedLogs),
+  );
+}
