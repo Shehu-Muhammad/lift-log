@@ -8,6 +8,10 @@ import {
 } from '@/lib/workouts/previousPerformance';
 import type { Workout } from '@/types/workout';
 import type { WorkoutLog } from '@/types/workoutLog';
+import {
+  getProgressionSuggestion,
+  type ProgressionSuggestion,
+} from '@/lib/workouts/progressionSuggestion';
 
 type WorkoutLoggerProps = {
   workout: Workout;
@@ -153,6 +157,14 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
             selectedOption?.id,
           );
         const previousSet = previousPerformance?.sets[0];
+        const progressionSuggestion: ProgressionSuggestion | undefined =
+          previousPerformance
+            ? getProgressionSuggestion({
+                trackingType,
+                previousSets: previousPerformance.sets,
+                targetReps: exercise.reps,
+              })
+            : undefined;
 
         return (
           <section
@@ -217,6 +229,18 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                     : previousSet.weight !== undefined
                       ? `${previousSet.weight} lbs × ${previousSet.reps ?? 0} reps`
                       : `${previousSet.reps ?? 0} reps`}
+                </p>
+              </div>
+            )}
+
+            {(!exercise.options || selectedOption) && progressionSuggestion && (
+              <div className='mt-3 rounded-lg border border-blue-900 bg-blue-950/40 p-3'>
+                <p className='text-xs font-medium uppercase tracking-wide text-blue-400'>
+                  Progression suggestion
+                </p>
+
+                <p className='mt-1 text-sm text-blue-100'>
+                  {progressionSuggestion.message}
                 </p>
               </div>
             )}
