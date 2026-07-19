@@ -12,6 +12,7 @@ type GetProgressionSuggestionArgs = {
   trackingType: ExerciseTrackingType;
   previousSets: LoggedSet[];
   targetReps: string;
+  expectedSetCount: number;
 };
 
 function getHighestCompletedWeight(sets: LoggedSet[]): number | undefined {
@@ -52,6 +53,7 @@ export function getProgressionSuggestion({
   trackingType,
   previousSets,
   targetReps,
+  expectedSetCount,
 }: GetProgressionSuggestionArgs): ProgressionSuggestion | undefined {
   const completedSets = previousSets.filter((set) => set.completed);
 
@@ -59,18 +61,27 @@ export function getProgressionSuggestion({
     return undefined;
   }
 
-  if (trackingType === 'duration') {
-    const previousDuration = getLowestCompletedDuration(completedSets);
+  const completedEverySet = completedSets.length >= expectedSetCount;
 
-    if (previousDuration === undefined) {
-      return undefined;
-    }
+if (trackingType === 'duration') {
+  const previousDuration = getLowestCompletedDuration(completedSets);
 
+  if (previousDuration === undefined) {
+    return undefined;
+  }
+
+  if (!completedEverySet) {
     return {
-      message: `Try holding for ${previousDuration + 5} seconds.`,
-      suggestedDuration: previousDuration + 5,
+      message: `Repeat ${previousDuration} seconds and complete all ${expectedSetCount} sets.`,
+      suggestedDuration: previousDuration,
     };
   }
+
+  return {
+    message: `Try holding for ${previousDuration + 5} seconds.`,
+    suggestedDuration: previousDuration + 5,
+  };
+}
 
   const lowestReps = getLowestCompletedReps(completedSets);
 
@@ -98,6 +109,14 @@ export function getProgressionSuggestion({
 
   if (previousWeight === undefined) {
     return undefined;
+  }
+
+  if (!completedEverySet) {
+    return {
+      message: `Keep ${previousWeight} lbs and complete all ${expectedSetCount} sets before increasing the weight.`,
+      suggestedWeight: previousWeight,
+      suggestedReps: lowestReps,
+    };
   }
 
   if (targetMaximum !== undefined && lowestReps >= targetMaximum) {

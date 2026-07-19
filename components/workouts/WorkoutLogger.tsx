@@ -163,6 +163,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                 trackingType,
                 previousSets: previousPerformance.sets,
                 targetReps: exercise.reps,
+                expectedSetCount: exercise.sets,
               })
             : undefined;
 
