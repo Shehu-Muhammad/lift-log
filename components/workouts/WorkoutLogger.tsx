@@ -235,12 +235,32 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
             )}
 
             {(!exercise.options || selectedOption) && progressionSuggestion && (
-              <div className='mt-3 rounded-lg border border-blue-900 bg-blue-950/40 p-3'>
-                <p className='text-xs font-medium uppercase tracking-wide text-blue-400'>
-                  Progression suggestion
+              <div
+                className={`mt-3 rounded-lg border p-3 ${
+                  progressionSuggestion.status === 'increase'
+                    ? 'border-green-900 bg-green-950/40'
+                    : progressionSuggestion.status === 'complete-sets'
+                      ? 'border-amber-900 bg-amber-950/40'
+                      : 'border-blue-900 bg-blue-950/40'
+                }`}
+              >
+                <p
+                  className={`text-xs font-medium uppercase tracking-wide ${
+                    progressionSuggestion.status === 'increase'
+                      ? 'text-green-400'
+                      : progressionSuggestion.status === 'complete-sets'
+                        ? 'text-amber-400'
+                        : 'text-blue-400'
+                  }`}
+                >
+                  {progressionSuggestion.status === 'increase'
+                    ? 'Ready to progress'
+                    : progressionSuggestion.status === 'complete-sets'
+                      ? 'Complete all sets'
+                      : 'Repeat and improve'}
                 </p>
 
-                <p className='mt-1 text-sm text-blue-100'>
+                <p className='mt-1 text-sm text-slate-100'>
                   {progressionSuggestion.message}
                 </p>
               </div>

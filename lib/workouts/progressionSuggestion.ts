@@ -2,6 +2,7 @@ import type { LoggedSet } from '@/types/workoutLog';
 import type { ExerciseTrackingType } from '@/types/workout';
 
 export type ProgressionSuggestion = {
+  status: 'increase' | 'repeat' | 'complete-sets';
   message: string;
   suggestedWeight?: number;
   suggestedReps?: number;
@@ -72,12 +73,14 @@ if (trackingType === 'duration') {
 
   if (!completedEverySet) {
     return {
+      status: 'complete-sets',
       message: `Repeat ${previousDuration} seconds and complete all ${expectedSetCount} sets.`,
       suggestedDuration: previousDuration,
     };
   }
 
   return {
+    status: 'increase',
     message: `Try holding for ${previousDuration + 5} seconds.`,
     suggestedDuration: previousDuration + 5,
   };
@@ -94,12 +97,14 @@ if (trackingType === 'duration') {
   if (trackingType === 'bodyweight-reps') {
     if (targetMaximum !== undefined && lowestReps >= targetMaximum) {
       return {
+        status: "increase",
         message: `Try ${lowestReps + 1} reps per set.`,
         suggestedReps: lowestReps + 1,
       };
     }
 
     return {
+      status: "repeat",
       message: `Repeat the same rep target and try to complete every set.`,
       suggestedReps: lowestReps,
     };
@@ -113,6 +118,7 @@ if (trackingType === 'duration') {
 
   if (!completedEverySet) {
     return {
+      status: "complete-sets",
       message: `Keep ${previousWeight} lbs and complete all ${expectedSetCount} sets before increasing the weight.`,
       suggestedWeight: previousWeight,
       suggestedReps: lowestReps,
@@ -124,6 +130,7 @@ if (trackingType === 'duration') {
     const suggestedWeight = previousWeight + increase;
 
     return {
+      status: "increase",
       message: `Try ${suggestedWeight} lbs while staying in the target rep range.`,
       suggestedWeight,
       suggestedReps: lowestReps,
@@ -131,6 +138,7 @@ if (trackingType === 'duration') {
   }
 
   return {
+    status: "repeat",
     message: `Keep ${previousWeight} lbs and try to add reps or complete every set.`,
     suggestedWeight: previousWeight,
     suggestedReps: lowestReps,
