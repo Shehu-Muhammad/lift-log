@@ -7,13 +7,20 @@ import {
   getDashboardStats,
   type DashboardStats,
 } from '@/lib/workouts/dashboardStats';
+import {
+  getRecentProgressSummary,
+  type RecentProgressSummary,
+} from '@/lib/workouts/recentProgress';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentProgress, setRecentProgress] =
+    useState<RecentProgressSummary | null>(null);
 
   useEffect(() => {
     const logs = getWorkoutLogs();
     setStats(getDashboardStats(logs));
+    setRecentProgress(getRecentProgressSummary(logs));
   }, []);
 
   if (!stats) {
@@ -58,8 +65,8 @@ export default function Dashboard() {
         </h2>
 
         <p className='mt-2 text-sm text-slate-400'>
-          Based on your most recently saved workout, this is the next routine
-          in your two-day rotation.
+          Based on your most recently saved workout, this is the next routine in
+          your two-day rotation.
         </p>
 
         <Link
@@ -84,13 +91,14 @@ export default function Dashboard() {
                 </h2>
 
                 <p className='mt-1 text-sm text-slate-400'>
-                  {new Date(
-                    stats.latestWorkout.completedAt,
-                  ).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
+                  {new Date(stats.latestWorkout.completedAt).toLocaleDateString(
+                    'en-US',
+                    {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    },
+                  )}
                 </p>
               </>
             ) : (
@@ -110,6 +118,44 @@ export default function Dashboard() {
           )}
         </div>
       </section>
+
+      {recentProgress && stats.totalWorkouts >= 2 && (
+        <section className='rounded-xl border border-slate-800 bg-slate-900 p-6'>
+          <p className='text-sm font-medium uppercase tracking-wide text-slate-500'>
+            Recent progress
+          </p>
+
+          <div className='mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
+            <div>
+              <p className='text-sm text-slate-400'>Latest completed sets</p>
+
+              <p className='mt-1 text-3xl font-bold text-white'>
+                {recentProgress.currentCompletedSets}
+              </p>
+
+              <p className='mt-1 text-sm text-slate-500'>
+                Previous workout: {recentProgress.previousCompletedSets}
+              </p>
+            </div>
+
+            <div
+              className={`w-fit rounded-full px-3 py-1 text-sm font-semibold ${
+                recentProgress.difference > 0
+                  ? 'bg-green-950 text-green-300'
+                  : recentProgress.difference < 0
+                    ? 'bg-amber-950 text-amber-300'
+                    : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              {recentProgress.difference > 0
+                ? `+${recentProgress.difference} sets`
+                : recentProgress.difference < 0
+                  ? `${recentProgress.difference} sets`
+                  : 'No change'}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className='grid gap-4 sm:grid-cols-2'>
         <Link
@@ -131,8 +177,8 @@ export default function Dashboard() {
           <p className='text-sm text-slate-400'>Workout</p>
           <h2 className='mt-1 text-xl font-semibold text-white'>Day 2</h2>
           <p className='mt-2 text-sm text-slate-400'>
-            Deadlift, incline press, vertical pull, Zercher squat, rows,
-            lateral raises, and core.
+            Deadlift, incline press, vertical pull, Zercher squat, rows, lateral
+            raises, and core.
           </p>
         </Link>
       </section>
