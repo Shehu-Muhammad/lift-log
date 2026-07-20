@@ -1,12 +1,22 @@
-import Image from 'next/image';
+import Dashboard from '@/components/dashboard/Dashboard';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className='min-h-screen bg-slate-950 p-8 text-white'>
-      <h1 className='text-4xl font-bold'>LiftLog</h1>
-      <p className='mt-2 text-slate-300'>
-        Track your workouts, nutrition, and progress.
+    <section>
+      <p className='text-sm font-medium uppercase tracking-wider text-blue-400'>
+        LiftLog Dashboard
       </p>
-    </main>
+
+      <h1 className='mt-2 text-3xl font-bold text-white'>
+        Track your training progress
+      </h1>
+
+      <p className='mt-2 max-w-2xl text-slate-400'>
+        Review your recent activity, continue your workout rotation, and keep
+        building strength.
+      </p>
+
+      <Dashboard />
+    </section>
   );
 }
