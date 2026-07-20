@@ -1,4 +1,5 @@
 import NutritionTracker from '@/components/nutrition/NutritionTracker';
+import FoodLogger from '@/components/nutrition/FoodLogger';
 
 export default function NutritionPage() {
   return (
@@ -16,6 +17,7 @@ export default function NutritionPage() {
       </p>
 
       <NutritionTracker />
+      <FoodLogger />
     </section>
   );
 }
