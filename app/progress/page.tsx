@@ -1,4 +1,5 @@
 import BodyWeightTracker from '@/components/progress/BodyWeightTracker';
+import StrengthProgress from '@/components/progress/StrengthProgress';
 
 export default function ProgressPage() {
   return (
@@ -16,6 +17,10 @@ export default function ProgressPage() {
       </p>
 
       <BodyWeightTracker />
+
+      <div className='mt-8'>
+        <StrengthProgress />
+      </div>
     </section>
   );
 }
