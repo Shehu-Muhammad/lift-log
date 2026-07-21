@@ -9,6 +9,7 @@ import {
   saveTargetWeight,
 } from '@/lib/storage/bodyWeightLogs';
 import type { BodyWeightEntry } from '@/types/bodyWeight';
+import BodyWeightChart from '@/components/progress/BodyWeightChart';
 
 function getTodayDate(): string {
   return new Date().toISOString().split('T')[0];
@@ -38,10 +39,7 @@ export default function BodyWeightTracker() {
   const distanceFromTarget = useMemo(() => {
     const parsedTarget = Number(targetWeight);
 
-    if (
-      currentWeight === undefined ||
-      !Number.isFinite(parsedTarget)
-    ) {
+    if (currentWeight === undefined || !Number.isFinite(parsedTarget)) {
       return undefined;
     }
 
@@ -93,9 +91,7 @@ export default function BodyWeightTracker() {
           <p className='text-sm text-slate-400'>Current weight</p>
 
           <p className='mt-2 text-3xl font-bold text-white'>
-            {currentWeight !== undefined
-              ? `${currentWeight} lbs`
-              : '—'}
+            {currentWeight !== undefined ? `${currentWeight} lbs` : '—'}
           </p>
         </article>
 
@@ -139,13 +135,23 @@ export default function BodyWeightTracker() {
       </section>
 
       <section className='rounded-xl border border-slate-800 bg-slate-900 p-6'>
+        <p className='text-sm font-medium uppercase tracking-wide text-slate-500'>
+          Weight trend
+        </p>
+
+        <h2 className='mt-2 text-2xl font-bold text-white'>
+          Progress over time
+        </h2>
+
+        <BodyWeightChart entries={entries} />
+      </section>
+
+      <section className='rounded-xl border border-slate-800 bg-slate-900 p-6'>
         <p className='text-sm font-medium uppercase tracking-wide text-blue-400'>
           New weigh-in
         </p>
 
-        <h2 className='mt-2 text-2xl font-bold text-white'>
-          Log body weight
-        </h2>
+        <h2 className='mt-2 text-2xl font-bold text-white'>Log body weight</h2>
 
         <div className='mt-6 grid gap-4 sm:grid-cols-2'>
           <label className='text-sm text-slate-300'>
@@ -199,9 +205,7 @@ export default function BodyWeightTracker() {
           Goal
         </p>
 
-        <h2 className='mt-2 text-2xl font-bold text-white'>
-          Target weight
-        </h2>
+        <h2 className='mt-2 text-2xl font-bold text-white'>Target weight</h2>
 
         <div className='mt-5 flex flex-col gap-3 sm:flex-row'>
           <div className='relative flex-1'>
@@ -247,9 +251,7 @@ export default function BodyWeightTracker() {
           History
         </p>
 
-        <h2 className='mt-2 text-2xl font-bold text-white'>
-          Recent weigh-ins
-        </h2>
+        <h2 className='mt-2 text-2xl font-bold text-white'>Recent weigh-ins</h2>
 
         {entries.length === 0 ? (
           <p className='mt-5 text-sm text-slate-400'>
@@ -263,18 +265,17 @@ export default function BodyWeightTracker() {
                 className='flex items-center justify-between gap-4 rounded-lg border border-slate-800 bg-slate-950 p-4'
               >
                 <div>
-                  <p className='font-semibold text-white'>
-                    {entry.weight} lbs
-                  </p>
+                  <p className='font-semibold text-white'>{entry.weight} lbs</p>
 
                   <p className='mt-1 text-sm text-slate-400'>
-                    {new Date(
-                      `${entry.date}T00:00:00`,
-                    ).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
+                    {new Date(`${entry.date}T00:00:00`).toLocaleDateString(
+                      'en-US',
+                      {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      },
+                    )}
                   </p>
                 </div>
 
