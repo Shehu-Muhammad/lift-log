@@ -32,6 +32,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
     Record<string, string>
   >({});
   const [saveMessage, setSaveMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
 
   useEffect(() => {
@@ -39,6 +40,43 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
   }, []);
 
   function finishWorkout() {
+    setSaveMessage('');
+    setErrorMessage('');
+
+    const missingExerciseChoice = workout.exercises.find(
+      (exercise) => exercise.options && !selectedOptions[exercise.id],
+    );
+
+    if (missingExerciseChoice) {
+      setErrorMessage(
+        `Choose an option for ${missingExerciseChoice.name} before finishing.`,
+      );
+      return;
+    }
+
+    const hasCompletedSet = Object.values(entries).some(
+      (entry) => entry.completed,
+    );
+
+    const completedSetMissingData = Object.values(entries).some(
+      (entry) =>
+        entry.completed &&
+        entry.weight.trim() === '' &&
+        entry.reps.trim() === '' &&
+        entry.duration.trim() === '',
+    );
+
+    if (completedSetMissingData) {
+      setErrorMessage(
+        'Every completed set must include weight, reps, or time.',
+      );
+      return;
+    }
+
+    if (!hasCompletedSet) {
+      setErrorMessage('Complete at least one set before saving the workout.');
+      return;
+    }
     const workoutLog: WorkoutLog = {
       id: crypto.randomUUID(),
       workoutId: workout.id,
@@ -91,6 +129,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
 
   function selectExerciseOption(exerciseId: string, optionId: string) {
     setSaveMessage('');
+    setErrorMessage('');
     setSelectedOptions((current) => ({
       ...current,
       [exerciseId]: optionId,
@@ -114,6 +153,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
     value: string | boolean,
   ) {
     setSaveMessage('');
+    setErrorMessage('');
 
     setEntries((current) => {
       const currentEntry: SetEntry = current[setId] ?? {
@@ -387,6 +427,15 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
           </section>
         );
       })}
+
+      {errorMessage && (
+        <p
+          role='alert'
+          className='rounded-lg border border-red-800 bg-red-950 p-3 text-sm text-red-300'
+        >
+          {errorMessage}
+        </p>
+      )}
 
       {saveMessage && (
         <p
