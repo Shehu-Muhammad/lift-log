@@ -67,10 +67,6 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
       return;
     }
 
-    if (!hasCompletedSet) {
-      setErrorMessage('Complete at least one set before saving the workout.');
-      return;
-    }
     const workoutLog: WorkoutLog = {
       id: crypto.randomUUID(),
       workoutId: workout.id,
