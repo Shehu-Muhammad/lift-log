@@ -64,6 +64,14 @@ export function getProgressionSuggestion({
 
   const completedEverySet = completedSets.length >= expectedSetCount;
 
+  // Check incomplete sets first.
+  if (completedSets.length < expectedSetCount) {
+    return {
+      status: 'complete-sets',
+      message: `Complete all ${expectedSetCount} planned sets before increasing the difficulty.`,
+    };
+  }
+
 if (trackingType === 'duration') {
   const previousDuration = getLowestCompletedDuration(completedSets);
 

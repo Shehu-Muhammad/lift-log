@@ -120,10 +120,23 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
   function selectExerciseOption(exerciseId: string, optionId: string) {
     setSaveMessage('');
     setErrorMessage('');
+
     setSelectedOptions((current) => ({
       ...current,
       [exerciseId]: optionId,
     }));
+
+    setEntries((current) => {
+      const updatedEntries = { ...current };
+
+      Object.keys(updatedEntries).forEach((entryKey) => {
+        if (entryKey.startsWith(`${exerciseId}-`)) {
+          delete updatedEntries[entryKey];
+        }
+      });
+
+      return updatedEntries;
+    });
   }
 
   function getSetEntry(setId: string): SetEntry {

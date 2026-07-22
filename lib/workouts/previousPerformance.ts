@@ -34,18 +34,18 @@ export function getPreviousPerformance(
       continue;
     }
 
-    const completedSets = matchingExercise.sets.filter(
+    const hasCompletedSet = matchingExercise.sets.some(
       (set) => set.completed,
     );
 
-    if (completedSets.length === 0) {
+    if (!hasCompletedSet) {
       continue;
     }
 
     return {
       exerciseId,
       selectedOptionId,
-      sets: completedSets,
+      sets: matchingExercise.sets,
       completedAt: log.completedAt,
     };
   }
