@@ -25,15 +25,15 @@ function getTodayDate(): string {
 
 export default function FoodLogger() {
   const [date] = useState(getTodayDate);
-  const [selectedFoodId, setSelectedFoodId] = useState(commonFoods[0]?.id ?? '');
+  const [selectedFoodId, setSelectedFoodId] = useState(
+    commonFoods[0]?.id ?? '',
+  );
   const [mealType, setMealType] = useState<MealType>('breakfast');
   const [servings, setServings] = useState('1');
   const [entries, setEntries] = useState<FoodLogEntry[]>([]);
   const [saveMessage, setSaveMessage] = useState('');
 
-  const selectedFood = commonFoods.find(
-    (food) => food.id === selectedFoodId,
-  );
+  const selectedFood = commonFoods.find((food) => food.id === selectedFoodId);
 
   useEffect(() => {
     setEntries(getFoodLogsByDate(date));
@@ -94,10 +94,18 @@ export default function FoodLogger() {
     setSaveMessage(`${selectedFood.name} added.`);
   }
 
-  function handleDelete(entryId: string) {
-    deleteFoodLogEntry(entryId);
+  function handleDelete(entry: FoodLogEntry) {
+    const confirmed = window.confirm(
+      `Delete ${entry.foodName} from ${entry.mealType}?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    deleteFoodLogEntry(entry.id);
     setEntries(getFoodLogsByDate(date));
-    setSaveMessage('Food entry deleted.');
+    setSaveMessage(`${entry.foodName} deleted from the food log.`);
   }
 
   return (
@@ -107,9 +115,7 @@ export default function FoodLogger() {
           Add food
         </p>
 
-        <h2 className='mt-2 text-2xl font-bold text-white'>
-          Log a meal item
-        </h2>
+        <h2 className='mt-2 text-2xl font-bold text-white'>Log a meal item</h2>
 
         <div className='mt-6 grid gap-4 md:grid-cols-3'>
           <label className='text-sm text-slate-300'>
@@ -201,14 +207,10 @@ export default function FoodLogger() {
           Today’s food
         </p>
 
-        <h2 className='mt-2 text-2xl font-bold text-white'>
-          Logged entries
-        </h2>
+        <h2 className='mt-2 text-2xl font-bold text-white'>Logged entries</h2>
 
         {entries.length === 0 ? (
-          <p className='mt-5 text-sm text-slate-400'>
-            No foods logged today.
-          </p>
+          <p className='mt-5 text-sm text-slate-400'>No foods logged today.</p>
         ) : (
           <div className='mt-5 space-y-3'>
             {entries.map((entry) => (
@@ -226,15 +228,14 @@ export default function FoodLogger() {
                   <p className='mt-2 text-sm text-slate-300'>
                     {Math.round(entry.calories)} kcal ·{' '}
                     {entry.protein.toFixed(1)}g protein ·{' '}
-                    {entry.carbs.toFixed(1)}g carbs ·{' '}
-                    {entry.fat.toFixed(1)}g fat ·{' '}
-                    {entry.fiber.toFixed(1)}g fiber
+                    {entry.carbs.toFixed(1)}g carbs · {entry.fat.toFixed(1)}g
+                    fat · {entry.fiber.toFixed(1)}g fiber
                   </p>
                 </div>
 
                 <button
                   type='button'
-                  onClick={() => handleDelete(entry.id)}
+                  onClick={() => handleDelete(entry)}
                   className='w-fit text-sm font-semibold text-red-400 hover:text-red-300'
                 >
                   Delete
