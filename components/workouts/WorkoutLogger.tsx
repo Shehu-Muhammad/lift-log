@@ -62,7 +62,67 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
 
     if (completedSetMissingData) {
       setErrorMessage(
-        'Every completed set must include weight, reps, or time.',
+        'Every completed set must include the required workout data.',
+      );
+      return;
+    }
+
+    const invalidCompletedSet = workout.exercises.some((exercise) => {
+      const selectedOptionId = selectedOptions[exercise.id];
+
+      const selectedOption = exercise.options?.find(
+        (option) => option.id === selectedOptionId,
+      );
+
+      const trackingType =
+        selectedOption?.trackingType ?? exercise.trackingType ?? 'weight-reps';
+
+      return Array.from({ length: exercise.sets }).some((_, setIndex) => {
+        const setId = `${exercise.id}-${setIndex}`;
+        const entry = entries[setId];
+
+        if (!entry?.completed) {
+          return false;
+        }
+
+        const weight =
+          entry.weight.trim() === '' ? undefined : Number(entry.weight);
+
+        const reps = entry.reps.trim() === '' ? undefined : Number(entry.reps);
+
+        const duration =
+          entry.duration.trim() === '' ? undefined : Number(entry.duration);
+
+        if (trackingType === 'weight-reps') {
+          return (
+            weight === undefined ||
+            reps === undefined ||
+            !Number.isFinite(weight) ||
+            !Number.isFinite(reps) ||
+            weight <= 0 ||
+            reps <= 0
+          );
+        }
+
+        if (trackingType === 'bodyweight-reps') {
+          return reps === undefined || !Number.isFinite(reps) || reps <= 0;
+        }
+
+        if (trackingType === 'duration') {
+          return (
+            duration === undefined ||
+            !Number.isFinite(duration) ||
+            duration <= 0
+          );
+        }
+
+        return false;
+      });
+    });
+
+    if (invalidCompletedSet) {
+      setErrorMessage(
+        'Completed weighted sets need weight and reps greater than 0. Bodyweight sets need reps greater than 0, and timed sets need time greater than 0.',
       );
       return;
     }
@@ -336,7 +396,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                           <div className='relative mt-1'>
                             <input
                               type='number'
-                              min='0'
+                              min='1'
                               step='1'
                               inputMode='numeric'
                               placeholder={
@@ -363,7 +423,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                               Weight
                               <input
                                 type='number'
-                                min='0'
+                                min='0.5'
                                 step='0.5'
                                 inputMode='decimal'
                                 placeholder={
@@ -390,7 +450,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                             Reps
                             <input
                               type='number'
-                              min='0'
+                              min='1'
                               step='1'
                               inputMode='numeric'
                               placeholder={
