@@ -78,8 +78,22 @@ export default function BodyWeightTracker() {
     setSaveMessage('Target weight saved successfully.');
   }
 
-  function handleDelete(entryId: string) {
-    deleteBodyWeightEntry(entryId);
+  function handleDelete(entry: BodyWeightEntry) {
+    const confirmed = window.confirm(
+      `Delete the ${entry.weight} lb weigh-in from ${new Date(
+        `${entry.date}T00:00:00`,
+      ).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })}?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    deleteBodyWeightEntry(entry.id);
     setEntries(getBodyWeightLogs());
     setSaveMessage('Weigh-in deleted.');
   }
@@ -281,7 +295,7 @@ export default function BodyWeightTracker() {
 
                 <button
                   type='button'
-                  onClick={() => handleDelete(entry.id)}
+                  onClick={() => handleDelete(entry)}
                   className='text-sm font-semibold text-red-400 hover:text-red-300'
                 >
                   Delete
