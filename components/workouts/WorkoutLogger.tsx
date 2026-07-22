@@ -43,20 +43,14 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
     setSaveMessage('');
     setErrorMessage('');
 
-    const missingExerciseChoice = workout.exercises.find(
-      (exercise) => exercise.options && !selectedOptions[exercise.id],
-    );
-
-    if (missingExerciseChoice) {
-      setErrorMessage(
-        `Choose an option for ${missingExerciseChoice.name} before finishing.`,
-      );
-      return;
-    }
-
     const hasCompletedSet = Object.values(entries).some(
       (entry) => entry.completed,
     );
+
+    if (!hasCompletedSet) {
+      setErrorMessage('Complete at least one set before saving the workout.');
+      return;
+    }
 
     const completedSetMissingData = Object.values(entries).some(
       (entry) =>
