@@ -32,6 +32,7 @@ export default function FoodLogger() {
   const [servings, setServings] = useState('1');
   const [entries, setEntries] = useState<FoodLogEntry[]>([]);
   const [saveMessage, setSaveMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
 
   const selectedFood = commonFoods.find((food) => food.id === selectedFoodId);
 
@@ -62,6 +63,7 @@ export default function FoodLogger() {
 
   function handleAddFood() {
     if (!selectedFood) {
+      setMessageType('error');
       setSaveMessage('Choose a food.');
       return;
     }
@@ -69,6 +71,7 @@ export default function FoodLogger() {
     const servingCount = Number(servings);
 
     if (!Number.isFinite(servingCount) || servingCount <= 0) {
+      setMessageType('error');
       setSaveMessage('Enter a serving amount greater than zero.');
       return;
     }
@@ -91,6 +94,7 @@ export default function FoodLogger() {
     saveFoodLogEntry(entry);
     setEntries(getFoodLogsByDate(date));
     setServings('1');
+    setMessageType('success');
     setSaveMessage(`${selectedFood.name} added.`);
   }
 
@@ -105,6 +109,7 @@ export default function FoodLogger() {
 
     deleteFoodLogEntry(entry.id);
     setEntries(getFoodLogsByDate(date));
+    setMessageType('success');
     setSaveMessage(`${entry.foodName} deleted from the food log.`);
   }
 
@@ -124,6 +129,7 @@ export default function FoodLogger() {
               value={selectedFoodId}
               onChange={(event) => {
                 setSelectedFoodId(event.target.value);
+                setMessageType('');
                 setSaveMessage('');
               }}
               className='mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-none focus:border-blue-500'
@@ -142,6 +148,7 @@ export default function FoodLogger() {
               value={mealType}
               onChange={(event) => {
                 setMealType(event.target.value as MealType);
+                setMessageType('');
                 setSaveMessage('');
               }}
               className='mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-none focus:border-blue-500'
@@ -163,6 +170,7 @@ export default function FoodLogger() {
               value={servings}
               onChange={(event) => {
                 setServings(event.target.value);
+                setMessageType('');
                 setSaveMessage('');
               }}
               className='mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-none focus:border-blue-500'
@@ -195,8 +203,12 @@ export default function FoodLogger() {
 
       {saveMessage && (
         <p
-          role='status'
-          className='rounded-lg border border-slate-800 bg-slate-900 p-3 text-sm text-slate-300'
+          role={messageType === 'error' ? 'alert' : 'status'}
+          className={`rounded-lg border p-3 text-sm ${
+            messageType === 'error'
+              ? 'border-red-800 bg-red-950 text-red-300'
+              : 'border-green-800 bg-green-950 text-green-300'
+          }`}
         >
           {saveMessage}
         </p>
