@@ -7,10 +7,7 @@ import {
   saveMacroGoals,
   saveNutritionLog,
 } from '@/lib/storage/nutritionLogs';
-import type {
-  DailyNutritionLog,
-  MacroGoals,
-} from '@/types/nutrition';
+import type { DailyNutritionLog, MacroGoals } from '@/types/nutrition';
 
 type MacroField = keyof Omit<DailyNutritionLog, 'date'>;
 
@@ -118,9 +115,7 @@ export default function NutritionTracker() {
                   min='0'
                   step='1'
                   value={log[field.key]}
-                  onChange={(event) =>
-                    updateLog(field.key, event.target.value)
-                  }
+                  onChange={(event) => updateLog(field.key, event.target.value)}
                   className='w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 pr-14 text-white outline-none transition focus:border-blue-500'
                 />
 
@@ -138,9 +133,7 @@ export default function NutritionTracker() {
           Daily goals
         </p>
 
-        <h2 className='mt-2 text-2xl font-bold text-white'>
-          Macro targets
-        </h2>
+        <h2 className='mt-2 text-2xl font-bold text-white'>Macro targets</h2>
 
         <div className='mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5'>
           {fields.map((field) => (
@@ -180,7 +173,7 @@ export default function NutritionTracker() {
       <button
         type='button'
         onClick={handleSave}
-        className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500'
+        className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
       >
         Save Nutrition
       </button>

@@ -71,7 +71,7 @@ export default function Dashboard() {
 
         <Link
           href={`/workouts/${stats.nextWorkoutId}`}
-          className='mt-5 inline-block rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500'
+          className='mt-5 inline-block rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
         >
           Start {stats.nextWorkoutName}
         </Link>
@@ -111,7 +111,7 @@ export default function Dashboard() {
           {stats.latestWorkout && (
             <Link
               href={`/history/${stats.latestWorkout.id}`}
-              className='w-fit text-sm font-semibold text-blue-400 hover:text-blue-300'
+              className='w-fit rounded text-sm font-semibold text-blue-400 hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
             >
               View details
             </Link>
@@ -160,7 +160,7 @@ export default function Dashboard() {
       <section className='grid gap-4 sm:grid-cols-2'>
         <Link
           href='/workouts/day-1'
-          className='rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-600'
+          className='rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
         >
           <p className='text-sm text-slate-400'>Workout</p>
           <h2 className='mt-1 text-xl font-semibold text-white'>Day 1</h2>
@@ -172,7 +172,7 @@ export default function Dashboard() {
 
         <Link
           href='/workouts/day-2'
-          className='rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-600'
+          className='rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
         >
           <p className='text-sm text-slate-400'>Workout</p>
           <h2 className='mt-1 text-xl font-semibold text-white'>Day 2</h2>

@@ -195,7 +195,7 @@ export default function FoodLogger() {
         <button
           type='button'
           onClick={handleAddFood}
-          className='mt-5 w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500'
+          className='mt-5 w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
         >
           Add Food
         </button>
@@ -248,7 +248,7 @@ export default function FoodLogger() {
                 <button
                   type='button'
                   onClick={() => handleDelete(entry)}
-                  className='w-fit text-sm font-semibold text-red-400 hover:text-red-300'
+                  className='w-fit rounded text-sm font-semibold text-red-400 hover:text-red-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
                 >
                   Delete
                 </button>

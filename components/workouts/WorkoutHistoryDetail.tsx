@@ -47,7 +47,7 @@ export default function WorkoutHistoryDetail({
 
         <Link
           href='/history'
-          className='mt-4 inline-block text-sm font-semibold text-blue-400 hover:text-blue-300'
+          className='mt-4 inline-block rounded text-sm font-semibold text-blue-400 hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
         >
           Back to history
         </Link>
@@ -71,7 +71,7 @@ export default function WorkoutHistoryDetail({
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <Link
           href='/history'
-          className='text-sm font-semibold text-blue-400 hover:text-blue-300'
+          className='rounded text-sm font-semibold text-blue-400 hover:text-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
         >
           ← Back to history
         </Link>
@@ -79,7 +79,7 @@ export default function WorkoutHistoryDetail({
         <button
           type='button'
           onClick={() => setShowDeleteConfirm(true)}
-          className='w-fit rounded-lg border border-red-800 px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-950'
+          className='w-fit rounded-lg border border-red-800 px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
         >
           Delete Workout
         </button>
@@ -172,7 +172,7 @@ export default function WorkoutHistoryDetail({
             <button
               type='button'
               onClick={handleDelete}
-              className='rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500'
+              className='rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
             >
               Yes, delete
             </button>
@@ -180,7 +180,7 @@ export default function WorkoutHistoryDetail({
             <button
               type='button'
               onClick={() => setShowDeleteConfirm(false)}
-              className='rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-700'
+              className='rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
             >
               Cancel
             </button>

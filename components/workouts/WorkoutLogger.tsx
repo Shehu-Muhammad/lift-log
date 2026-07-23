@@ -306,7 +306,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                             selectExerciseOption(exercise.id, option.id)
                           }
                           aria-pressed={isSelected}
-                          className={`rounded-lg border px-4 py-2 text-sm font-semibold transition ${
+                          className={`rounded-lg border px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
                             isSelected
                               ? 'border-blue-500 bg-blue-600 text-white'
                               : 'border-slate-700 bg-slate-950 text-slate-300 hover:border-slate-500'
@@ -474,7 +474,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
                           updateSet(setId, 'completed', !entry.completed)
                         }
                         aria-pressed={entry.completed}
-                        className={`rounded-lg px-3 py-2 font-semibold transition ${
+                        className={`rounded-lg px-3 py-2 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
                           entry.completed
                             ? 'bg-green-600 text-white'
                             : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
@@ -512,7 +512,7 @@ export default function WorkoutLogger({ workout }: WorkoutLoggerProps) {
       <button
         type='button'
         onClick={finishWorkout}
-        className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500'
+        className='w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
       >
         Finish Workout
       </button>
