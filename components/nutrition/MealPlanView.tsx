@@ -48,7 +48,8 @@ export default function MealPlanView() {
 
     const servings = Number(value);
 
-    if (!Number.isFinite(servings) || servings < 0) {
+    if (!Number.isFinite(servings) || servings <= 0) {
+      setSaveMessage('Servings must be greater than 0.');
       return;
     }
 
@@ -221,7 +222,7 @@ export default function MealPlanView() {
                       <div className='mt-1 flex items-center gap-2'>
                         <input
                           type='number'
-                          min='0'
+                          min='0.25'
                           step='0.25'
                           value={item.servings}
                           onChange={(event) =>
