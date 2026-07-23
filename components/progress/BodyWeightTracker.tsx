@@ -15,12 +15,17 @@ function getTodayDate(): string {
   return new Date().toISOString().split('T')[0];
 }
 
+function isFutureDate(date: string): boolean {
+  return date > getTodayDate();
+}
+
 export default function BodyWeightTracker() {
   const [date, setDate] = useState(getTodayDate);
   const [weight, setWeight] = useState('');
   const [targetWeight, setTargetWeight] = useState('215');
   const [entries, setEntries] = useState<BodyWeightEntry[]>([]);
   const [saveMessage, setSaveMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
 
   useEffect(() => {
     setEntries(getBodyWeightLogs());
@@ -49,7 +54,20 @@ export default function BodyWeightTracker() {
   function handleSaveEntry() {
     const parsedWeight = Number(weight);
 
+    if (!date) {
+      setMessageType('error');
+      setSaveMessage('Choose a weigh-in date.');
+      return;
+    }
+
+    if (isFutureDate(date)) {
+      setMessageType('error');
+      setSaveMessage('Weigh-in dates cannot be in the future.');
+      return;
+    }
+
     if (!Number.isFinite(parsedWeight) || parsedWeight <= 0) {
+      setMessageType('error');
       setSaveMessage('Enter a valid body weight.');
       return;
     }
@@ -63,6 +81,7 @@ export default function BodyWeightTracker() {
     saveBodyWeightEntry(entry);
     setEntries(getBodyWeightLogs());
     setWeight('');
+    setMessageType('success');
     setSaveMessage('Body weight saved successfully.');
   }
 
@@ -70,11 +89,13 @@ export default function BodyWeightTracker() {
     const parsedTarget = Number(targetWeight);
 
     if (!Number.isFinite(parsedTarget) || parsedTarget <= 0) {
+      setMessageType('error');
       setSaveMessage('Enter a valid target weight.');
       return;
     }
 
     saveTargetWeight(parsedTarget);
+    setMessageType('success');
     setSaveMessage('Target weight saved successfully.');
   }
 
@@ -95,6 +116,7 @@ export default function BodyWeightTracker() {
 
     deleteBodyWeightEntry(entry.id);
     setEntries(getBodyWeightLogs());
+    setMessageType('success');
     setSaveMessage('Weigh-in deleted.');
   }
 
@@ -173,8 +195,10 @@ export default function BodyWeightTracker() {
             <input
               type='date'
               value={date}
+              max={getTodayDate()}
               onChange={(event) => {
                 setDate(event.target.value);
+                setMessageType('');
                 setSaveMessage('');
               }}
               className='mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-none focus:border-blue-500'
@@ -193,6 +217,7 @@ export default function BodyWeightTracker() {
                 value={weight}
                 onChange={(event) => {
                   setWeight(event.target.value);
+                  setMessageType('');
                   setSaveMessage('');
                 }}
                 className='w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 pr-14 text-white outline-none focus:border-blue-500'
@@ -231,6 +256,7 @@ export default function BodyWeightTracker() {
               value={targetWeight}
               onChange={(event) => {
                 setTargetWeight(event.target.value);
+                setMessageType('');
                 setSaveMessage('');
               }}
               className='w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 pr-14 text-white outline-none focus:border-blue-500'
@@ -253,8 +279,12 @@ export default function BodyWeightTracker() {
 
       {saveMessage && (
         <p
-          role='status'
-          className='rounded-lg border border-slate-800 bg-slate-900 p-3 text-sm text-slate-300'
+          role={messageType === 'error' ? 'alert' : 'status'}
+          className={`rounded-lg border p-3 text-sm ${
+            messageType === 'error'
+              ? 'border-red-800 bg-red-950 text-red-300'
+              : 'border-green-800 bg-green-950 text-green-300'
+          }`}
         >
           {saveMessage}
         </p>
