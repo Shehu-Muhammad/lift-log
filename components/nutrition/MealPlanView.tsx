@@ -15,6 +15,7 @@ function getTodayDate(): string {
 }
 
 export default function MealPlanView() {
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const [saveMessage, setSaveMessage] = useState('');
   const [mealPlan, setMealPlan] = useState<MealPlan>(() =>
     structuredClone(defaultMealPlan),
@@ -29,6 +30,7 @@ export default function MealPlanView() {
 
   function toggleMeal(mealId: string) {
     setSaveMessage('');
+    setMessageType('');
 
     setMealPlan((current) => ({
       ...current,
@@ -45,10 +47,12 @@ export default function MealPlanView() {
 
   function updateServing(mealId: string, foodId: string, value: string) {
     setSaveMessage('');
+    setMessageType('');
 
     const servings = Number(value);
 
     if (!Number.isFinite(servings) || servings <= 0) {
+      setMessageType('error');
       setSaveMessage('Servings must be greater than 0.');
       return;
     }
@@ -75,6 +79,7 @@ export default function MealPlanView() {
 
   function copyMealToToday(meal: MealPlanMeal) {
     if (!meal.enabled) {
+      setMessageType('error');
       setSaveMessage(`${meal.name} is currently skipped.`);
       return;
     }
@@ -104,6 +109,7 @@ export default function MealPlanView() {
       });
     });
 
+    setMessageType('success');
     setSaveMessage(`${meal.name} added to today’s food log.`);
   }
 
@@ -160,8 +166,12 @@ export default function MealPlanView() {
 
       {saveMessage && (
         <p
-          role='status'
-          className='rounded-lg border border-green-800 bg-green-950 p-3 text-sm text-green-300'
+          role={messageType === 'error' ? 'alert' : 'status'}
+          className={`rounded-lg border p-3 text-sm ${
+            messageType === 'error'
+              ? 'border-red-800 bg-red-950 text-red-300'
+              : 'border-green-800 bg-green-950 text-green-300'
+          }`}
         >
           {saveMessage}
         </p>
@@ -190,7 +200,8 @@ export default function MealPlanView() {
                 type='button'
                 onClick={() => toggleMeal(meal.id)}
                 aria-pressed={meal.enabled}
-                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 
+                ${
                   meal.enabled
                     ? 'bg-green-950 text-green-300 hover:bg-green-900'
                     : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
@@ -267,7 +278,7 @@ export default function MealPlanView() {
               type='button'
               onClick={() => copyMealToToday(meal)}
               disabled={!meal.enabled}
-              className='mt-5 w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500'
+              className='mt-5 w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
             >
               Add {meal.name} to Today
             </button>
